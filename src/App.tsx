@@ -5,7 +5,7 @@ import Calendar from './components/Calendar';
 
 function App() {
   return (
-    <div className="App">
+    <div className="App font-sans">
       <Calendar />
     </div>
   );

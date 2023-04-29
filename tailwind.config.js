@@ -5,8 +5,11 @@ module.exports = {
   ],
   theme: {
     extend: {
+      fontFamily: {
+        sans: ['Roboto', 'sans-serif'],
+      },
       gridTemplateRows: {
-        day : 'repeat(25, minmax(0, 50px))'
+        day : 'repeat(25, minmax(0, 40px))'
       },
       gridRowStart: {
         '8': '8',

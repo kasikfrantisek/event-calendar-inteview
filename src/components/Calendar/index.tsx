@@ -9,6 +9,7 @@ import Header from '../Header';
 import Week from '../Week';
 import DayCell from '../Day';
 import { Day } from '../../types/day';
+import { Event } from '../../types/event';
   
   type Dates = {
     dates: Day[];
@@ -29,6 +30,19 @@ function Calendar() {
     const [arrayOfDays, setArrayOfDays] = useState<Dates>([])
     const [currentWeek, setCurrentWeek] = useState(now)
     const [view, setView] = useState<string>('month')
+    const [events, setEvents] = useState<Event[]>([])
+
+    const addEvent = (data:Event) => {
+      setEvents(prev => {
+        return [...prev, data]
+      })
+    }
+
+    const deleteEvent = (event:Event) => {
+      const index = events.indexOf(event)
+      events.splice(index, 1) // remove one element at the specified index
+      setEvents([...events]) // update the state with a new array containing the modified elements
+    }
 
     const next = () => {
       if(view === 'month'){
@@ -43,6 +57,7 @@ function Calendar() {
         setCurrentMonth(() => currentMonth.subtract(1, 'month'));
       } else if(view === 'week'){
         setCurrentWeek(() => currentWeek.subtract(1, 'week'))
+        setCurrentMonth(() => now)
       }
     }
 
@@ -126,19 +141,28 @@ function Calendar() {
     const renderCells = () => {
         const rows:JSX.Element[] = [];
         let days:JSX.Element[] = [];
+        let eventsDay:Event[] = []
 
         arrayOfDays.forEach((week, index) => {
             week.dates.forEach((d, i) => {
+                events.forEach((e) => {
+                  const sameDay = new Date(e.since).getDate() === d.day;
+                  const sameMonth = new Date(e.since).getMonth() === d.month;
+                  if(sameDay && sameMonth){
+                    eventsDay.push(e)
+                  }
+                })
                 days.push(
-                    <DayCell data={d} key={i} fn={changeWeek} view={view}/>
+                    <DayCell data={d} key={i} fn={changeWeek} view={view} add={addEvent} deleteEvent={deleteEvent} events={eventsDay}/>
                 )
+                eventsDay = []
             })
             rows.push(
-                <div className='grid grid-cols-7 gap-2 mb-3' key={index}>{days}</div>
+                <div className='grid gap-[2px] mb-[2px] grid-cols-7' key={index}>{days}</div>
             )
             days = []
         })
-        return <div className='w-2/4 self-center'>{rows}</div>
+        return <div className='w-full h-full self-center'>{rows}</div>
     }
 
     const changeView = () => {
@@ -155,11 +179,7 @@ function Calendar() {
 
   return (
     <div className='flex flex-col justify-center'>
-      <div>
-        <button onClick={currentState}>Current</button><br/>
-        <button onClick={changeView}>Change to: {view === 'month' ? 'weekly' : 'monthly'} view</button>
-      </div>
-        <Header prevFn={prev} nextFn={next} current={currentMonth.format(dateFormat)} view={view} week={currentWeek.week()}/>
+        <Header prevFn={prev} nextFn={next} changeView={changeView} currentDay={currentState} current={currentMonth.format(dateFormat)} view={view} week={currentWeek.week()}/>
         <Week now={now} />
         {renderCells()}
     </div>

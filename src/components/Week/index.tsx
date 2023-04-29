@@ -14,7 +14,7 @@ function Week({now}:{now:dayjs.Dayjs}) {
         )
     }
 
-    return <div className='grid grid-cols-7 w-2/4 self-center'>{days}</div>
+    return <div className='grid grid-cols-7 w-full gap-[2px] mb-[2px] self-center'>{days}</div>
 }
 
 export default Week
